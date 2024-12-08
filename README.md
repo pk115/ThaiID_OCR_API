@@ -1,65 +1,128 @@
-Thai ID Card OCR API
-This is a Python API for Optical Character Recognition (OCR) specifically designed for the Thai language. The API supports general OCR as well as OCR for Thai National ID cards. Inputs can be provided as images or Base64-encoded strings.
+# OCR API ภาษาไทย พร้อมใช้งานใน Docker | Thai OCR API with Docker Support
 
-Features
-General OCR: Extract text from any image containing Thai text.
-OCR Thai National ID Card (Image Input): Extract structured information from Thai National ID cards by providing an image file.
-OCR Thai National ID Card (Base64 Input): Extract structured information from Thai National ID cards using a Base64-encoded image string.
+API นี้ออกแบบมาเพื่อดึงข้อมูลจากรูปภาพด้วยเทคโนโลยี OCR (Optical Character Recognition) รองรับการใช้งานกับ Docker และสามารถใช้งานได้ทั้งภาษาไทยและภาษาอังกฤษ โดยมี Endpoint ที่ใช้งานได้ดังนี้:
 
-# OCR API ภาษาไทย (รองรับ Docker)
+This API is designed for extracting text from images using OCR (Optical Character Recognition) technology. It supports Docker and can process both Thai and English. The following endpoints are available:
 
-โปรเจคนี้เป็น API สำหรับ OCR ข้อความภาษาไทย รวมถึงการดึงข้อมูลจากบัตรประชาชนไทย
+---
 
-## คุณสมบัติ
-- **OCR ข้อความทั่วไป:** อัพโหลดรูปภาพเพื่ออ่านข้อความภาษาไทย
-- **OCR บัตรประชาชนไทย:** รองรับ input ทั้งรูปภาพและ Base64
-- รองรับการใช้งานผ่าน Docker
+## การติดตั้งและการใช้งาน | Installation and Usage
 
-## วิธีติดตั้ง
-
-### ใช้งานด้วย Docker
-1. สร้าง Docker Image
-    ```bash
-    docker build -t ocr-api .
-    ```
-2. รัน Docker Container
-    ```bash
-    docker run -d -p 8000:8000 ocr-api
-    ```
-
-### รันในเครื่อง
-1. ติดตั้ง Dependency
-    ```bash
-    pip install -r requirements.txt
-    ```
-2. รันเซิร์ฟเวอร์
-    ```bash
-    uvicorn main:app --host 0.0.0.0 --port 8000
-    ```
-
-## วิธีการใช้งาน
-
-### Endpoint
-1. **OCR ข้อความทั่วไป**
-    - URL: `/ocr/all/`
-    - Method: `POST`
-    - Payload: อัพโหลดไฟล์รูปภาพ
-2. **OCR บัตรประชาชนไทย (Input เป็นรูปภาพ)**
-    - URL: `/ocr/idcard/image/`
-    - Method: `POST`
-    - Payload: อัพโหลดไฟล์รูปภาพ
-3. **OCR บัตรประชาชนไทย (Input เป็น Base64)**
-    - URL: `/ocr/idcard/base64/`
-    - Method: `POST`
-    - Payload: JSON 
-      ```json
-      {
-          "base64_string": "BASE64_ENCODED_IMAGE"
-      }
-      ```
-
-### ตัวอย่างการใช้งาน
-#### ด้วย cURL
+### 1. Clone Repository
 ```bash
-curl -X POST "http://localhost:8000/ocr/all/" \
--F "image=@path_to_image.jpg"
+git clone <repository-url>
+cd <repository-folder>
+2. ตั้งค่า Docker | Set Up Docker
+ตรวจสอบให้แน่ใจว่าไฟล์ Dockerfile และ docker-compose.yml พร้อมใช้งานแล้ว
+Ensure that Dockerfile and docker-compose.yml are properly configured.
+
+3. สร้างและรัน Docker Container | Build and Run Docker Container
+bash
+คัดลอกโค้ด
+docker-compose up --build
+4. การใช้งาน API | Using the API
+เมื่อ Container ทำงานสำเร็จ API จะพร้อมใช้งานที่ http://localhost:8000
+Once the container is running, the API will be accessible at http://localhost:8000.
+
+Endpoints
+1. OCR ข้อมูลทั้งหมด | OCR All Data
+URL: http://localhost:8000/ocr/rawdata/
+Method: POST
+Input:
+รูปภาพ (Multipart Form Data) | Image (Multipart Form Data)
+Output:
+json
+คัดลอกโค้ด
+{
+  "text": [
+    "string"
+  ]
+}
+2. OCR บัตรประชาชนไทย (รูปภาพ) | OCR Thai ID Card (Image)
+URL: http://localhost:8000/ocr/thaiidcard/
+Method: POST
+Input:
+รูปภาพ (Multipart Form Data) | Image (Multipart Form Data)
+Output:
+json
+คัดลอกโค้ด
+{
+  "cardNumber": "string",
+  "prename": "string",
+  "firstname": "string",
+  "lastname": "string",
+  "birthDate": "string",
+  "address": "string",
+  "addressno": "string",
+  "moo": "string",
+  "subdistrict": "string",
+  "district": "string",
+  "province": "string",
+  "gender": "string",
+  "status": "failed",
+  "message": "error",
+  "rawocr": [
+    "string"
+  ]
+}
+3. OCR บัตรประชาชนไทย (Base64) | OCR Thai ID Card (Base64)
+URL: http://localhost:8000/ocr/thaiidcard/base64/
+Method: POST
+Input:
+Base64 ของรูปภาพ | Base64 encoded image
+Output:
+json
+คัดลอกโค้ด
+{
+  "cardNumber": "string",
+  "prename": "string",
+  "firstname": "string",
+  "lastname": "string",
+  "birthDate": "string",
+  "address": "string",
+  "addressno": "string",
+  "moo": "string",
+  "subdistrict": "string",
+  "district": "string",
+  "province": "string",
+  "gender": "string",
+  "status": "failed",
+  "message": "error",
+  "rawocr": [
+    "string"
+  ]
+}
+ตัวอย่างคำขอ | Sample Requests
+OCR ข้อมูลทั้งหมด | OCR All Data
+bash
+คัดลอกโค้ด
+curl -X POST http://localhost:8000/ocr/rawdata/ \
+-F "file=@path_to_image.jpg"
+OCR บัตรประชาชนไทย (รูปภาพ) | OCR Thai ID Card (Image)
+bash
+คัดลอกโค้ด
+curl -X POST http://localhost:8000/ocr/thaiidcard/ \
+-F "file=@path_to_image.jpg"
+OCR บัตรประชาชนไทย (Base64) | OCR Thai ID Card (Base64)
+bash
+คัดลอกโค้ด
+curl -X POST http://localhost:8000/ocr/thaiidcard/base64/ \
+-H "Content-Type: application/json" \
+-d '{"image": "Base64_encoded_string_here"}'
+การทดสอบ | Testing
+สามารถใช้เครื่องมือเช่น Postman หรือ curl เพื่อส่งคำขอและตรวจสอบการทำงาน
+Use tools like Postman or curl to send requests and validate functionality.
+
+การพัฒนาเพิ่มเติม | Further Development
+เพิ่ม Library หรือ Module | Add Libraries or Modules
+อัปเดตไฟล์ requirements.txt และรันคำสั่ง: Update requirements.txt and run:
+
+bash
+คัดลอกโค้ด
+docker-compose build
+การ Debug | Debugging
+ดู Log การทำงานของ Container ด้วยคำสั่ง: View container logs with:
+
+bash
+คัดลอกโค้ด
+docker logs <container-id>
