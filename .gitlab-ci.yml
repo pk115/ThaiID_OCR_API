@@ -1,0 +1,27 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - docker info
+
+build:
+  stage: build
+  script:
+    - docker build -t ocridcard:latest .
+    - docker tag ocridcard:latest registry.gitlab.com/sleepeye2/ocridcard:latest
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin registry.gitlab.com
+    - docker push registry.gitlab.com/sleepeye2/ocridcard:latest
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploy stage - you can add your deployment scripts here"
